@@ -7,6 +7,7 @@ import static seedu.address.logic.commands.CommandTestUtil.assertCommandFailure;
 import static seedu.address.logic.commands.CommandTestUtil.assertCommandSuccess;
 import static seedu.address.logic.commands.CommandTestUtil.showPersonAtIndex;
 import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
+import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_TASK;
 import static seedu.address.testutil.TypicalIndexes.INDEX_SECOND_PERSON;
 import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
 
@@ -28,7 +29,6 @@ import seedu.address.testutil.PersonBuilder;
 class EditTaskCommandTest {
 
     private static final String TASK_STUB = "Some task";
-    private static final Index TASK_INDEX_ONE = Index.fromOneBased(1);
 
     private final Model model = new ModelManager(getTypicalAddressBook(), new UserPrefs());
 
@@ -38,12 +38,12 @@ class EditTaskCommandTest {
 
         Patient firstPatient = model.getFilteredPersonList().get(INDEX_FIRST_PERSON.getZeroBased());
         Patient editedPatient = new PersonBuilder(firstPatient)
-                .withTasks(firstPatient.getTasks().edit(TASK_INDEX_ONE.getZeroBased(), editedTask)
+                .withTasks(firstPatient.getTasks().edit(INDEX_FIRST_TASK.getZeroBased(), editedTask)
                         .getTasks().stream().map(Object::toString).toArray(String[]::new)) // to convert the TaskList
                 // into an array of string representation of tasks
                 .build();
 
-        EditTaskCommand editTaskCommand = new EditTaskCommand(INDEX_FIRST_PERSON, TASK_INDEX_ONE, editedTask);
+        EditTaskCommand editTaskCommand = new EditTaskCommand(INDEX_FIRST_PERSON, INDEX_FIRST_TASK, editedTask);
 
         String expectedMessage = String.format(EditTaskCommand.MESSAGE_EDIT_TASK_SUCCESS, editedPatient);
 
@@ -56,7 +56,7 @@ class EditTaskCommandTest {
     @Test
     public void execute_invalidPersonIndexUnfilteredList_failure() {
         Index outOfBoundIndex = Index.fromOneBased(model.getFilteredPersonList().size() + 1);
-        EditTaskCommand editTaskCommand = new EditTaskCommand(outOfBoundIndex, TASK_INDEX_ONE, new Task(TASK_STUB));
+        EditTaskCommand editTaskCommand = new EditTaskCommand(outOfBoundIndex, INDEX_FIRST_TASK, new Task(TASK_STUB));
 
         assertCommandFailure(editTaskCommand, model, Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
     }
@@ -68,7 +68,7 @@ class EditTaskCommandTest {
 
         assertTrue(outOfBoundIndex.getZeroBased() < model.getAddressBook().getPersonList().size());
 
-        EditTaskCommand editTaskCommand = new EditTaskCommand(outOfBoundIndex, TASK_INDEX_ONE, new Task(TASK_STUB));
+        EditTaskCommand editTaskCommand = new EditTaskCommand(outOfBoundIndex, INDEX_FIRST_TASK, new Task(TASK_STUB));
 
         assertCommandFailure(editTaskCommand, model, Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
     }
@@ -85,11 +85,11 @@ class EditTaskCommandTest {
 
     @Test
     public void equals() {
-        final EditTaskCommand standardCommand = new EditTaskCommand(INDEX_FIRST_PERSON, TASK_INDEX_ONE,
+        final EditTaskCommand standardCommand = new EditTaskCommand(INDEX_FIRST_PERSON, INDEX_FIRST_TASK,
                 new Task(TASK_STUB));
 
         // same values -> returns true
-        EditTaskCommand commandWithSameValues = new EditTaskCommand(INDEX_FIRST_PERSON, TASK_INDEX_ONE,
+        EditTaskCommand commandWithSameValues = new EditTaskCommand(INDEX_FIRST_PERSON, INDEX_FIRST_TASK,
                 new Task(TASK_STUB));
         assertEquals(standardCommand, commandWithSameValues);
 
@@ -100,10 +100,11 @@ class EditTaskCommandTest {
         assertNotEquals(null, standardCommand);
 
         // different index -> returns false
-        assertNotEquals(standardCommand, new EditTaskCommand(INDEX_SECOND_PERSON, TASK_INDEX_ONE, new Task(TASK_STUB)));
+        assertNotEquals(standardCommand, new EditTaskCommand(INDEX_SECOND_PERSON, INDEX_FIRST_TASK,
+                new Task(TASK_STUB)));
 
         // different task -> returns false
-        assertNotEquals(standardCommand, new EditTaskCommand(INDEX_FIRST_PERSON, TASK_INDEX_ONE,
+        assertNotEquals(standardCommand, new EditTaskCommand(INDEX_FIRST_PERSON, INDEX_FIRST_TASK,
                 new Task("not task stub")));
     }
 }
